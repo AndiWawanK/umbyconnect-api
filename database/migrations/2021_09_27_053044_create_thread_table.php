@@ -17,12 +17,12 @@ class CreateThreadTable extends Migration
             $table->id();
             $table->integer('user_id')->index();
             $table->integer('topic_id')->index();
-            $table->integer('title');
-            $table->integer('body')->nullable();
-            $table->integer('link')->nullable();
-            $table->integer('image')->nullable();
-            $table->integer('tag')->nullable();
-            $table->integer('slug')->nullable();
+            $table->longText('title');
+            $table->longText('body')->nullable();
+            $table->string('link')->nullable();
+            $table->string('image')->nullable();
+            $table->string('tag')->nullable();
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }
