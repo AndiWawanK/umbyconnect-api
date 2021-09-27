@@ -14,14 +14,36 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::get('login', function (Request $request) {
+//     // return $request->user();
+// });
 
 // authentication route
 Route::group([
     'namespace' => 'App\Http\Controllers\API\Auth',
     'prefix' => 'v1'
 ],function(){
+    // Route::post('/login', ['as' => 'login', 'uses' => 'LoginController@entry']);
     Route::post('/login', 'LoginController@entry');
+    Route::post('/register', 'RegisterController@create');
+});
+
+// thread route
+Route::group([
+    'middleware' => 'auth:sanctum',
+    'namespace' => 'App\Http\Controllers\API',
+    'prefix' => 'v1'
+], function(){
+    Route::get('/thread', 'ThreadController@show');
+});
+
+// profile route
+Route::group([
+    'middleware' => 'auth:sanctum',
+    'namespace' => 'App\Http\Controllers\API',
+    'prefix' => 'v1'
+], function(){
+    Route::get('/profile', 'ProfileController@show');
+    Route::post('/set-avatar', 'ProfileController@setAvatar');
+    
 });
