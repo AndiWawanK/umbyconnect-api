@@ -23,5 +23,17 @@ class Thread extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function reaction(){
+        return $this->hasMany(ThreadReaction::class, 'id')->select('id', 'type');
+    }
+
+    public function comment(){
+        return $this->hasMany(Comment::class);
+    }
+
+    public function topic(){
+        return $this->belongsTo(Topic::class, 'topic_id')->select('id', 'name', 'icon');
+    }
     
 }

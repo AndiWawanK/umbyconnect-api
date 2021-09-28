@@ -35,6 +35,7 @@ Route::group([
     'prefix' => 'v1'
 ], function(){
     Route::get('/thread', 'ThreadController@show');
+    Route::get('/thread/{threadId}/comment', 'ThreadController@comment');
 });
 
 // profile route
