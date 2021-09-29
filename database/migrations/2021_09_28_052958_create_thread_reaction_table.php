@@ -17,9 +17,7 @@ class CreateThreadReactionTable extends Migration
             $table->id();
             $table->integer('thread_id')->index();
             $table->integer('user_id')->index();
-            $table->integer('status');
             $table->string('type', 50);
-            $table->integer('total');
             $table->timestamps();
         });
     }

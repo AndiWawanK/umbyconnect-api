@@ -17,9 +17,7 @@ class CreateCommentReactionTable extends Migration
             $table->id();
             $table->integer('comment_id')->index();
             $table->integer('user_id')->index();
-            $table->integer('status');
             $table->string('type', 50);
-            $table->integer('total');
             $table->timestamps();
         });
     }
