@@ -45,6 +45,9 @@ Route::group([
     'prefix' => 'v1'
 ], function(){
     Route::get('/profile', 'ProfileController@show');
+    Route::get('/profile/thread', 'ProfileController@showThread');
+    Route::get('/profile/followers', 'ProfileController@showFollowers');
+    Route::get('/profile/following', 'ProfileController@showFollowing');
     Route::post('/set-avatar', 'ProfileController@setAvatar');
     
 });
