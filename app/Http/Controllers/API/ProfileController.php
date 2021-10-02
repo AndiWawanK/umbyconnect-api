@@ -84,11 +84,11 @@ class ProfileController extends Controller
             DB::beginTransaction();
             try{
                 User::where('id', $user->id)->update([
-                    'message' => 'Avatar successfully updated!',
                     'avatar' => $request->input('avatar')
                 ]);
                 DB::commit();
                 return response()->json([
+                    'message' => 'Avatar successfully updated!',
                     'avatar' => $request->input('avatar')
                 ]);
             }catch(Exception $e){
