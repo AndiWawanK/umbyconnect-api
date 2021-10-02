@@ -13,16 +13,14 @@ use App\Models\Followers;
 class ProfileController extends Controller
 {
     public function show(Request $request){
-        $param = $request->username;
-        if($param){
-            $user = User::withCount(['followers AS followers', 'following AS following', 'thread AS thread_total'])
+        $param = $request->username 
+            ? $request->username 
+            : $request->user()->username;
+
+        $user = User::withCount(['followers AS followers', 'following AS following', 'thread AS thread_total'])
                     ->where('username', $param)
                     ->get();
-            return response()->json($user);
-        }else{
-            $currentUser = $request->user();
-            // dd('Nothing else');
-        }
+        return response()->json($user);
     }
 
     public function showThread(Request $request){
