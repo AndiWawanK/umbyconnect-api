@@ -49,5 +49,13 @@ Route::group([
     Route::get('/profile/followers', 'ProfileController@showFollowers');
     Route::get('/profile/following', 'ProfileController@showFollowing');
     Route::post('/set-avatar', 'ProfileController@setAvatar');
-    
+});
+
+// master route
+Route::group([
+    'middleware' => 'auth:sanctum',
+    'namespace' => 'App\Http\Controllers\API',
+    'prefix' => 'v1'
+], function(){
+    Route::get('/master/choose-avatar', 'MasterController@showAvatarOptions');
 });
