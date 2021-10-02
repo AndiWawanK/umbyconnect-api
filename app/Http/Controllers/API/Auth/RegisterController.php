@@ -35,7 +35,7 @@ class RegisterController extends Controller
             return response()->json([
                 'userdata' => $user,
                 'token' => $token
-            ]);
+            ], 201);
         }catch(Exception $e){
             DB::rollback();
             return response()->json(['error' => $e], 400);
