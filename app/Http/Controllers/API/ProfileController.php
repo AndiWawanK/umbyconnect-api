@@ -19,7 +19,7 @@ class ProfileController extends Controller
 
         $user = User::withCount(['followers AS followers', 'following AS following', 'thread AS thread_total'])
                     ->where('username', $param)
-                    ->get();
+                    ->first();
         return response()->json($user);
     }
 
