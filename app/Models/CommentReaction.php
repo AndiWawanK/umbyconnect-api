@@ -9,5 +9,5 @@ class CommentReaction extends Model
 {
     use HasFactory;
     protected $table = 'comment_reaction';
-    protected $guraded = [];
+    protected $guarded = [];
 }
