@@ -17,9 +17,17 @@ class ProfileController extends Controller
             ? $request->username 
             : $request->user()->username;
 
+        $userId = User::where('username', $param)->first();
+
+        $isFollow = Followers::where([
+            ['follower_id', '=', $request->user()->id],
+            ['followed_id', '=', $userId->id] 
+        ])->exists();
+
         $user = User::withCount(['followers AS followers', 'following AS following', 'thread AS thread_total'])
                     ->where('username', $param)
                     ->first();
+        $user->isFollow = $isFollow;
         return response()->json($user);
     }
 
@@ -55,6 +63,39 @@ class ProfileController extends Controller
             $results = array_column($following->toArray(), 'following');
             return response()->json($results);
         }
+    }
+
+    public function follow(Request $request){
+        $currentUserId = $request->user();
+        $userId = $request->userId;
+
+        $isFollow = Followers::where([
+            ['follower_id', '=', $currentUserId->id],
+            ['followed_id', '=', $userId] 
+        ])->exists();
+
+        DB::beginTransaction();
+        try{
+            if($isFollow){
+                $unfollow = Followers::where([
+                    ['follower_id', '=', $currentUserId->id],
+                    ['followed_id', '=', $userId] 
+                ])->delete();
+                DB::commit();
+                return response()->json(['isFollow' => false], 200);
+            }else{
+                $follow = Followers::create([
+                    'follower_id' => $currentUserId->id,
+                    'followed_id' => $userId
+                ]);
+                DB::commit();
+                return response()->json(['isFollow' => true], 200);
+            }
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e], 400);
+        }
+
     }
 
     public function setAvatar(Request $request){ 

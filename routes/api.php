@@ -48,6 +48,7 @@ Route::group([
     Route::get('/profile/thread', 'ProfileController@showThread');
     Route::get('/profile/followers', 'ProfileController@showFollowers');
     Route::get('/profile/following', 'ProfileController@showFollowing');
+    Route::get('/profile/{userId}/follow', 'ProfileController@follow');
     Route::post('/set-avatar', 'ProfileController@setAvatar');
 });
 
