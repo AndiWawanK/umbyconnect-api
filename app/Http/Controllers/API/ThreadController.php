@@ -60,7 +60,7 @@ class ThreadController extends Controller
                     ['type', '=', $reactionType],
                     ['comment_id', '=', $comment->id]
                 ])->get();
-                $userId = array_column($reaction->toArray(), 'id');
+                $userId = array_column($reaction->toArray(), 'user_id');
                 if(count($reaction) > 0){
                     $react = [
                         'user_id' => $userId,
