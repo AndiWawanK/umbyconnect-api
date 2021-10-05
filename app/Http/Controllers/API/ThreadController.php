@@ -129,7 +129,9 @@ class ThreadController extends Controller
                     ['type', '=', $request->input('type')],
                     ['comment_id', '=', $commentId]
                 ])->get();
+                $userReaction = array_column($currentReaction->toArray(), 'user_id');
                 return response()->json([
+                    'user_id' => $userReaction,
                     'type' => $request->input('type'),
                     'total' => count($currentReaction)
                 ], 200);
@@ -144,7 +146,9 @@ class ThreadController extends Controller
                     ['type', '=', $request->input('type')],
                     ['comment_id', '=', $commentId]
                 ])->get();
+                $userReaction = array_column($currentReaction->toArray(), 'user_id');
                 return response()->json([
+                    'user_id' => $userReaction,
                     'type' => $request->input('type'),
                     'total' => count($currentReaction)
                 ], 200);
