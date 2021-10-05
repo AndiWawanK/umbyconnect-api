@@ -39,6 +39,7 @@ class ThreadController extends Controller
     }
 
     public function showComment(Request $request){
+        $currentUser = $request->user();
         $threadId = $request->threadId;
         $_limit = $request->limit ? $request->limit : 5;
 
@@ -59,9 +60,10 @@ class ThreadController extends Controller
                     ['type', '=', $reactionType],
                     ['comment_id', '=', $comment->id]
                 ])->get();
-
+                $userId = array_column($reaction->toArray(), 'id');
                 if(count($reaction) > 0){
                     $react = [
+                        'user_id' => $userId,
                         'type' => $reactionType,
                         'total' => count($reaction)
                     ];
