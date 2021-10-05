@@ -61,4 +61,5 @@ Route::group([
     'prefix' => 'v1'
 ], function(){
     Route::get('/master/choose-avatar', 'MasterController@showAvatarOptions');
+    Route::get('/master/topics', 'MasterController@showTopics');
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Topic;
 
 class MasterController extends Controller
 {
@@ -22,5 +23,10 @@ class MasterController extends Controller
             }
         }
         return response()->json($results);
+    }
+
+    public function showTopics(Request $request){
+        $topics = Topic::select('id', 'name', 'description', 'icon')->get();
+        return response()->json($topics, 200);
     }
 }
