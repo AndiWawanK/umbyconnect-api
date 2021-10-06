@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 use DB;
+use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Thread;
@@ -17,7 +18,7 @@ class ThreadController extends Controller
         $_limit = $request->limit ? (int)$request->limit : 10;
 
         if($param){
-            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'body', 'image', 'created_at')->with(['user' => function($user){
+            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'created_at')->with(['user' => function($user){
                     $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
                 }, 'reaction'])
                 ->where('topic_id', $param)
@@ -157,5 +158,51 @@ class ThreadController extends Controller
             DB::rollback();
             return response()->json(['error' => $e], 400);
         }
+    }
+
+    public function createThread(Request $request){
+        $currentUser = $request->user();
+        $validator = Validator::make($request->all(), [
+            'topic_id' => 'required',
+            'title' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return response()->json($validator->errors(), 400);
+        }
+
+        DB::beginTransaction();
+        try{
+            $link = '';
+            if($file = $request->file('image')){
+                $filePath = 'upload/'.$currentUser->username.'/thread';
+                $fileName = preg_replace('/[^A-Za-z0-9\-]/', '', pathinfo($file->getClientOriginalName())['filename']) . time() . '.' .$file->getClientOriginalExtension();
+                $file->move(public_path($filePath), $fileName);
+                $link = url($filePath) . '/' . $fileName;
+            }
+            $createThread = Thread::create([
+                'user_id' => $currentUser->id,
+                'topic_id' => $request->input('topic_id'),
+                'title' => $request->input('title'),
+                'body' => $request->input('body'),
+                'link' => $request->input('link'),
+                'image' => $link,
+            ]);
+            DB::commit();
+            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'created_at')->with(['user' => function($user){
+                $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
+            }, 'reaction'])
+                ->where([
+                    ['topic_id', '=', $request->input('topic_id')],
+                    ['id', '=', $createThread->id]
+                ])
+                ->withCount('comment AS total_comment')
+                ->first();
+            return response()->json($thread);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e], 400);
+        }
+
     }
 }

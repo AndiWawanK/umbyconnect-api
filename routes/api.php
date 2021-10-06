@@ -38,6 +38,7 @@ Route::group([
     Route::get('/thread/{threadId}/comment', 'ThreadController@showComment');
     Route::post('/thread/{threadId}/comment', 'ThreadController@createComment');
     Route::post('/thread/{threadId}/comment/{commentId}/reaction', 'ThreadController@createReaction');
+    Route::post('/thread/create', 'ThreadController@createThread');
 });
 
 // profile route
