@@ -173,7 +173,7 @@ class ThreadController extends Controller
 
         DB::beginTransaction();
         try{
-            $link = '';
+            $link = null;
             if($file = $request->file('image')){
                 $filePath = 'upload/'.$currentUser->username.'/thread';
                 $fileName = preg_replace('/[^A-Za-z0-9\-]/', '', pathinfo($file->getClientOriginalName())['filename']) . time() . '.' .$file->getClientOriginalExtension();
