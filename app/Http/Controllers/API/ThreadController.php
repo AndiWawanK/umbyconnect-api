@@ -198,7 +198,7 @@ class ThreadController extends Controller
                 ])
                 ->withCount('comment AS total_comment')
                 ->first();
-            return response()->json($thread);
+            return response()->json($thread, 201);
         }catch(Exception $e){
             DB::rollback();
             return response()->json(['error' => $e], 400);
