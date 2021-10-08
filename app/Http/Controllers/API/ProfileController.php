@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use DB;
+use Validator;
 use App\Models\User;
 use App\Models\Thread;
 use App\Models\Followers;
+use File;
+use Illuminate\Filesystem\Filesystem;
 
 class ProfileController extends Controller
 {
@@ -137,5 +140,53 @@ class ProfileController extends Controller
                 return response()->json(['error' => $e], 400);
             }
         }
+    }
+
+    public function updateProfile(Request $request){
+        $currentUser = $request->user();
+
+        DB::beginTransaction();
+        try{
+            $link = null;
+            if($file = $request->file('avatar')){
+                $avatars = [];
+                $directory = 'upload/'.$currentUser->username.'/avatar/';
+                if(is_dir($directory)){
+                    $entry = scandir(public_path($directory));
+                    $counter = 0;
+                    foreach ($entry as $key => $value) {
+                        if ($value != "." && $value != "..") {
+                            $path = $directory . $value;
+                            array_push($avatars, $path);
+                        }
+                    }
+                    if(count($avatars) > 0){
+                        File::delete($avatars);
+                    }
+                    $link = $this->doUploadAvatar($file, $directory);
+                }else{
+                    $link = $this->doUploadAvatar($file, $directory);
+                }
+            }
+            $data = $request->all();
+            $data['avatar'] = $link;
+            $result = array_filter($data);
+            $updateProfile = User::where('id', $currentUser->id)->update($result);
+            DB::commit();
+            $updated = User::where('id', $currentUser->id)->first();
+            return response()->json($updated);
+
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e], 400);
+        }
+
+    }
+
+    public function doUploadAvatar($file, $directory){
+        $fileName = preg_replace('/[^A-Za-z0-9\-]/', '', pathinfo($file->getClientOriginalName())['filename']) . time() . '.' .$file->getClientOriginalExtension();
+        $file->move(public_path($directory), $fileName);
+        $link = url($directory) . '/' . $fileName;
+        return $link;
     }
 }

@@ -53,6 +53,7 @@ Route::group([
     Route::get('/profile/following', 'ProfileController@showFollowing');
     Route::get('/profile/{userId}/follow', 'ProfileController@follow');
     Route::post('/set-avatar', 'ProfileController@setAvatar');
+    Route::post('/profile/update', 'ProfileController@updateProfile');
 });
 
 // master route
