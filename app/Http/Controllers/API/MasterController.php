@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Topic;
+use App\Models\Major;
+use App\Models\Faculty;
 
 class MasterController extends Controller
 {
@@ -28,5 +30,14 @@ class MasterController extends Controller
     public function showTopics(Request $request){
         $topics = Topic::select('id', 'name', 'description', 'icon')->get();
         return response()->json($topics, 200);
+    }
+
+    public function showFaculty(Request $request){
+        if($request->code){
+            $major = Major::where('faculty_code', $request->code)->get();
+            return response()->json($major);
+        }
+        $faculty = Faculty::get();
+        return response()->json($faculty);
     }
 }

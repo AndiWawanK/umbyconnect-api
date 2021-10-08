@@ -64,4 +64,5 @@ Route::group([
 ], function(){
     Route::get('/master/choose-avatar', 'MasterController@showAvatarOptions');
     Route::get('/master/topics', 'MasterController@showTopics');
+    Route::get('/master/faculty', 'MasterController@showFaculty');
 });
