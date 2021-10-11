@@ -35,9 +35,10 @@ class LoginController extends Controller
         }
 
         $token = $user->createToken($request->input('email'))->plainTextToken;
-
+        $completion = $user->full_name ? "true" : "false";
         return response()->json([
             'status_code' => 200,
+            'completion' => $completion,
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 200);
