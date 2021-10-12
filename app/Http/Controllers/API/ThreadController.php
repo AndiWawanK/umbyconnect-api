@@ -19,7 +19,7 @@ class ThreadController extends Controller
         $_limit = $request->limit ? (int)$request->limit : 10;
 
         if($param){
-            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'created_at')->with(['user' => function($user){
+            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'total_view', 'created_at')->with(['user' => function($user){
                     $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
                 }])
                 ->where('topic_id', $param)
@@ -30,7 +30,7 @@ class ThreadController extends Controller
             return response()->json($thread, 200);
         }
         
-        $thread = Thread::select('id', 'user_id', 'title', 'body', 'image', 'created_at')->with(['user' => function($user){
+        $thread = Thread::select('id', 'user_id', 'title', 'body', 'image', 'total_view', 'created_at')->with(['user' => function($user){
             $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
         }])
         ->orderBy('created_at', $_orderBy)
@@ -188,9 +188,10 @@ class ThreadController extends Controller
                 'body' => $request->input('body'),
                 'link' => $request->input('link'),
                 'image' => $link,
+                'total_view' => 0
             ]);
             DB::commit();
-            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'created_at')->with(['user' => function($user){
+            $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'total_view', 'created_at')->with(['user' => function($user){
                 $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
             }, 'reaction'])
                 ->where([
@@ -257,5 +258,21 @@ class ThreadController extends Controller
             return response()->json(['error', $e], 400);
         }
 
+    }
+
+    public function countThreadView(Request $request){
+        $currentThread = Thread::where('id', $request->threadId)->first();
+        $currentView = $currentThread->total_view === null ? 0 : $currentThread->total_view;
+        DB::beginTransaction();
+        try{
+            $updateView = Thread::where('id', $request->threadId)->update([
+                'total_view' => $currentView + 1
+            ]);
+            DB::commit();
+            return response()->json(['log' => 'Updating total view . . .']);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e], 400);
+        }
     }
 }
