@@ -37,7 +37,8 @@ Route::group([
     Route::get('/thread', 'ThreadController@show');
     Route::get('/thread/{threadId}/comment', 'ThreadController@showComment');
     Route::post('/thread/{threadId}/comment', 'ThreadController@createComment');
-    Route::post('/thread/{threadId}/comment/{commentId}/reaction', 'ThreadController@createReaction');
+    Route::post('/thread/{threadId}/comment/{commentId}/reaction', 'ThreadController@createCommentReaction');
+    Route::post('/thread/{threadId}/reaction', 'ThreadController@createThreadReaction');
     Route::post('/thread/create', 'ThreadController@createThread');
 });
 

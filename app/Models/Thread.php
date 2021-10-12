@@ -25,7 +25,7 @@ class Thread extends Model
     }
 
     public function reaction(){
-        return $this->hasMany(ThreadReaction::class, 'id')->select('id', 'type');
+        return $this->hasMany(ThreadReaction::class);
     }
 
     public function comment(){

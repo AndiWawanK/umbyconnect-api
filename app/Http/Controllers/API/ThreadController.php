@@ -9,6 +9,7 @@ use App\Models\Thread;
 use App\Models\Topic;
 use App\Models\Comment;
 use App\Models\CommentReaction;
+use App\Models\ThreadReaction;
 
 class ThreadController extends Controller
 {
@@ -20,10 +21,10 @@ class ThreadController extends Controller
         if($param){
             $thread = Thread::select('id', 'user_id', 'topic_id', 'title', 'link', 'body', 'image', 'created_at')->with(['user' => function($user){
                     $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
-                }, 'reaction'])
+                }])
                 ->where('topic_id', $param)
                 ->orderBy('created_at', $_orderBy)
-                ->withCount('comment AS total_comment')
+                ->withCount(['comment AS total_comment', 'reaction as total_reaction'])
                 ->limit($_limit)
                 ->get();
             return response()->json($thread, 200);
@@ -31,9 +32,9 @@ class ThreadController extends Controller
         
         $thread = Thread::select('id', 'user_id', 'title', 'body', 'image', 'created_at')->with(['user' => function($user){
             $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
-        }, 'reaction'])
+        }])
         ->orderBy('created_at', $_orderBy)
-        ->withCount('comment AS total_comment')
+        ->withCount(['comment AS total_comment', 'reaction AS total_reaction'])
         ->limit($_limit)
         ->get();
         return response()->json($thread, 200);
@@ -103,7 +104,7 @@ class ThreadController extends Controller
         }
     }
 
-    public function createReaction(Request $request){
+    public function createCommentReaction(Request $request){
         $currentUser = $request->user();
         $threadId = $request->threadId;
         $commentId = $request->commentId;
@@ -202,6 +203,60 @@ class ThreadController extends Controller
         }catch(Exception $e){
             DB::rollback();
             return response()->json(['error' => $e], 400);
+        }
+
+    }
+
+    public function createThreadReaction(Request $request){
+        $currentUser = $request->user();
+        $threadId = $request->threadId;
+
+        $hasReaction = ThreadReaction::where([
+            ['user_id', '=', $currentUser->id],
+            ['thread_id', '=', $threadId]
+        ])->exists();
+
+        DB::beginTransaction();
+        try{
+
+            if($hasReaction){
+                $updateReaction = ThreadReaction::where([
+                    ['user_id', '=', $currentUser->id],
+                    ['thread_id', '=', $threadId]
+                ])->update([
+                    'thread_id' => $threadId,
+                    'user_id' => $currentUser->id,
+                    'type' => $request->input('type')
+                ]);
+                DB::commit();
+                $currentReaction = ThreadReaction::where([
+                    ['type', '=', $request->input('type')],
+                    ['thread_id', '=', $threadId]
+                ])->get();
+                return response()->json([
+                    'type' => $request->input('type'),
+                    'total' => count($currentReaction)
+                ], 200);
+            }else{
+                $createReaction = ThreadReaction::create([
+                    'thread_id' => $threadId,
+                    'user_id' => $currentUser->id,
+                    'type' => $request->input('type')
+                ]);
+                DB::commit();
+                $currentReaction = ThreadReaction::where([
+                    ['type', '=', $request->input('type')],
+                    ['thread_id', '=', $threadId]
+                ])->get();
+                return response()->json([
+                    'type' => $request->input('type'),
+                    'total' => count($currentReaction)
+                ], 200);
+            }
+
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error', $e], 400);
         }
 
     }
