@@ -269,7 +269,11 @@ class ThreadController extends Controller
                 'total_view' => $currentView + 1
             ]);
             DB::commit();
-            return response()->json(['log' => 'Updating total view . . .']);
+            $currentThread = Thread::where('id', $request->threadId)->first();
+            return response()->json([
+                'action' => 'Updating total view.',
+                'current_view' => $currentThread->total_view
+            ]);
         }catch(Exception $e){
             DB::rollback();
             return response()->json(['error' => $e], 400);
