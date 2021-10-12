@@ -230,7 +230,6 @@ class ThreadController extends Controller
                 ]);
                 DB::commit();
                 $currentReaction = ThreadReaction::where([
-                    ['type', '=', $request->input('type')],
                     ['thread_id', '=', $threadId]
                 ])->get();
                 return response()->json([
@@ -245,7 +244,6 @@ class ThreadController extends Controller
                 ]);
                 DB::commit();
                 $currentReaction = ThreadReaction::where([
-                    ['type', '=', $request->input('type')],
                     ['thread_id', '=', $threadId]
                 ])->get();
                 return response()->json([
