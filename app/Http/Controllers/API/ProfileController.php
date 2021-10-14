@@ -40,9 +40,9 @@ class ProfileController extends Controller
         if($param){
             $thread = Thread::select('id', 'user_id', 'title', 'body', 'image', 'created_at')->with(['user' => function($user){
                     $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
-                }, 'reaction'])
+                }])
                 ->orderBy('created_at', 'desc')
-                ->withCount('comment AS total_comment')
+                ->withCount(['comment AS total_comment', 'reaction as total_reaction'])
                 ->limit($_limit)
                 ->where('user_id', '=', $param)
                 ->get();
