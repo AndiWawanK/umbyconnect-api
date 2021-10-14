@@ -52,6 +52,7 @@ class ThreadController extends Controller
             ->with(['user' => function($user){
                 $user->select('id', 'full_name', 'username', 'avatar', 'major', 'year_class');
             }])
+            ->orderBy('created_at', 'desc')
             ->limit($_limit)
             ->get();
 
