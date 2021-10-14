@@ -54,7 +54,7 @@ class ProfileController extends Controller
     public function showFollowers(Request $request){
         $param = $request->user_id;
         if($param){
-            $followers = Followers::with('followers')->where('follower_id', $param)->get();
+            $followers = Followers::with('followers')->where('followed_id', $param)->get();
             $results = array_column($followers->toArray(), 'followers');
             return response()->json($results);
         }
@@ -62,7 +62,7 @@ class ProfileController extends Controller
     public function showFollowing(Request $request){
         $param = $request->user_id;
         if($param){
-            $following = Followers::with('following')->where('followed_id', $param)->get();
+            $following = Followers::with('following')->where('follower_id', $param)->get();
             $results = array_column($following->toArray(), 'following');
             return response()->json($results);
         }
@@ -81,15 +81,15 @@ class ProfileController extends Controller
         try{
             if($isFollow){
                 $unfollow = Followers::where([
-                    ['follower_id', '=', $currentUserId->id],
-                    ['followed_id', '=', $userId] 
+                    ['follower_id', '=', $userId],
+                    ['followed_id', '=', $currentUserId->id] 
                 ])->delete();
                 DB::commit();
                 return response()->json(['isFollow' => false], 200);
             }else{
                 $follow = Followers::create([
-                    'follower_id' => $currentUserId->id,
-                    'followed_id' => $userId
+                    'follower_id' => $userId,
+                    'followed_id' => $currentUserId->id
                 ]);
                 DB::commit();
                 return response()->json(['isFollow' => true], 200);
