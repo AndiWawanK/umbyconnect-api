@@ -58,6 +58,15 @@ Route::group([
     Route::post('/profile/update', 'ProfileController@updateProfile');
 });
 
+// chatroom route
+Route::group([
+    'middleware' => 'auth:sanctum',
+    'namespace' => 'App\Http\Controllers\API',
+    'prefix' => 'v1'
+], function(){
+    Route::post('/chat/start', 'ChatController@startChat');
+});
+
 // master route
 Route::group([
     'middleware' => 'auth:sanctum',
