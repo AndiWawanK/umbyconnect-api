@@ -17,6 +17,8 @@ class ChatController extends Controller
         $user = User::where('id', $request->input('to'))->first();
         // $hasConversation = Chatroom::where('user_id', 144)->where('user_id', 143)->firstOrfail();
         // return response()->json($hasConversation);
+        // https://instagram.com/zahraanrl?utm_medium=copy_link
+        // https://instagram.com/deyaaletha?utm_medium=copy_link
         DB::beginTransaction();
         try{
             $create = Chatroom::insert([
@@ -35,12 +37,19 @@ class ChatController extends Controller
             ]);
             DB::commit();
             $firestore = app('firebase.firestore')->database();
-            $firestore->collection('chat/'.$request->input('room').'/messages')->newDocument()->set([
-                'message' => $request->input('message'),
+            $firestore->collection('chat/'.$request->input('room').'/messages')->document(sha1(time()))->set([
+                '_id' => sha1(time()),
+                'text' => $request->input('message'),
+                'createdAt' => Carbon::now()->format('Y-m-d H:i:s'),
+                'user' => [
+                    '_id' => $currentUser->id,
+                    'name' => $currentUser->full_name,
+                    'avatar' => $currentUser->avatar
+                ],
                 'thread_forward' => $request->input('thread_forward'),
                 'link' => $request->input('link'),
-                'is_read' => false,
-                'sender_id' => $currentUser->id
+                'sent' => false,
+                'received' => false
             ]);
             $pushNotification = $this->sendNotification($user->fcm_token, $currentUser);
             return response()->json([
