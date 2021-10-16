@@ -58,4 +58,7 @@ class User extends Authenticatable
     public function thread(){
         return $this->hasMany(Thread::class);
     }
+    public function chatroom(){
+        return $this->hasMany(Chatroom::class);
+    }
 }

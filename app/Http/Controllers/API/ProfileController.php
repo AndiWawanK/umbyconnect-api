@@ -10,6 +10,7 @@ use Validator;
 use App\Models\User;
 use App\Models\Thread;
 use App\Models\Followers;
+use App\Models\Chatroom;
 use File;
 use Illuminate\Filesystem\Filesystem;
 
@@ -62,8 +63,16 @@ class ProfileController extends Controller
     public function showFollowing(Request $request){
         $param = $request->user_id;
         if($param){
+            $rooms = Chatroom::where('user_id', $param)->pluck('room');
             $following = Followers::with('following')->where('follower_id', $param)->get();
             $results = array_column($following->toArray(), 'following');
+            foreach($results as $key => $result){
+                $results[$key]['room'] = null;
+                if($result != null && $result['id'] != $param){
+                    $conversation = Chatroom::where('user_id', $result['id'])->whereIn('room', $rooms->toArray())->first();
+                    $results[$key]['room'] = $conversation != null ? $conversation['room'] : null;
+                }
+            }
             return response()->json($results);
         }
     }

@@ -63,6 +63,22 @@ class ChatController extends Controller
         }
     }
 
+    public function showConversation(Request $request){
+        $currentUser = $request->user();
+
+        $rooms = Chatroom::where('user_id', $currentUser->id)->pluck('room');
+        $results = [];
+        foreach($rooms as $room){
+            $conversation = Chatroom::with('user')->where([
+                ['user_id', '!=', $currentUser->id],
+                ['room', '=', $room]
+            ])->first();
+            array_push($results, $conversation->toArray());
+        }
+        return response()->json($results);
+
+    }
+
     public function sendNotification($fcmToken, $sender){
         $url = "https://fcm.googleapis.com/fcm/send";            
         $header = [

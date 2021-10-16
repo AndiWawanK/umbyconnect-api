@@ -65,6 +65,7 @@ Route::group([
     'prefix' => 'v1'
 ], function(){
     Route::post('/chat/start', 'ChatController@startChat');
+    Route::get('/chat', 'ChatController@showConversation');
 });
 
 // master route
