@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Chatroom;
 use App\Models\User;
 use Carbon\Carbon;
-use Kreait\Firebase\Factory;
+// use Kreait\Firebase\Factory;
 // use Kreait\Firebase\ServiceAccount;
 
 class ChatController extends Controller
@@ -38,25 +38,25 @@ class ChatController extends Controller
             ]);
             DB::commit();
             // $firestore = app('firebase.firestore')->database();
-            $firestore = (new Factory)
-            ->withServiceAccount(__DIR__ . '/umbyforum-9309b-firebase-adminsdk-vwuyt-20b6d4f450.json')
-            ->createFirestore();
-            $fireRef = $firestore->database();
+            // $firestore = (new Factory)
+            // ->withServiceAccount(__DIR__ . '/umbyforum-9309b-firebase-adminsdk-vwuyt-20b6d4f450.json')
+            // ->createFirestore();
+            // $fireRef = $firestore->database();
 
-            $fireRef->collection('chats/'.$request->input('room').'/messages')->document(sha1(time()))->set([
-                '_id' => sha1(time()),
-                'text' => $request->input('message'),
-                'createdAt' => Carbon::now()->format('Y-m-d H:i:s'),
-                'user' => [
-                    '_id' => $currentUser->id,
-                    'name' => $currentUser->full_name,
-                    'avatar' => $currentUser->avatar
-                ],
-                'thread_forward' => $request->input('thread_forward'),
-                'link' => $request->input('link'),
-                'sent' => false,
-                'received' => false
-            ]);
+            // $fireRef->collection('chats/'.$request->input('room').'/messages')->document(sha1(time()))->set([
+            //     '_id' => sha1(time()),
+            //     'text' => $request->input('message'),
+            //     'createdAt' => Carbon::now()->format('Y-m-d H:i:s'),
+            //     'user' => [
+            //         '_id' => $currentUser->id,
+            //         'name' => $currentUser->full_name,
+            //         'avatar' => $currentUser->avatar
+            //     ],
+            //     'thread_forward' => $request->input('thread_forward'),
+            //     'link' => $request->input('link'),
+            //     'sent' => false,
+            //     'received' => false
+            // ]);
             $pushNotification = $this->sendNotification($user->fcm_token, $currentUser);
             return response()->json([
                 'status' => true,
