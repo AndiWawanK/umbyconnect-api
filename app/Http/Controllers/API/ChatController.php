@@ -9,6 +9,7 @@ use App\Models\Chatroom;
 use App\Models\User;
 use Carbon\Carbon;
 use Kreait\Firebase\Factory;
+// use Kreait\Firebase\ServiceAccount;
 
 class ChatController extends Controller
 {
@@ -36,8 +37,13 @@ class ChatController extends Controller
                 ]
             ]);
             DB::commit();
-            $firestore = app('firebase.firestore')->database();
-            $firestore->collection('chat/'.$request->input('room').'/messages')->document(sha1(time()))->set([
+            // $firestore = app('firebase.firestore')->database();
+            $firestore = (new Factory)
+            ->withServiceAccount(__DIR__ . '/umbyforum-9309b-firebase-adminsdk-vwuyt-20b6d4f450.json')
+            ->createFirestore();
+            $fireRef = $firestore->database();
+
+            $fireRef->collection('chats/'.$request->input('room').'/messages')->document(sha1(time()))->set([
                 '_id' => sha1(time()),
                 'text' => $request->input('message'),
                 'createdAt' => Carbon::now()->format('Y-m-d H:i:s'),
