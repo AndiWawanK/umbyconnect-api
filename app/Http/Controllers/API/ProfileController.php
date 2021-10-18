@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Thread;
 use App\Models\Followers;
 use App\Models\Chatroom;
+use App\Models\Notification;
 use File;
 use Illuminate\Filesystem\Filesystem;
 
@@ -217,6 +218,41 @@ class ProfileController extends Controller
                 'status' => 'success',
                 'fcm_token' => $request->input('fcm_token')
             ]);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e], 400);
+        }
+    }
+
+    public function getUserNotification(Request $request){
+        $currentUser = $request->user();
+        $rooms = Chatroom::where('user_id', $currentUser->id)->pluck('room');
+
+        $notifications = Notification::with(['fromuser', 'thread'])->where('user_id', $currentUser->id)->get();
+        foreach($notifications as $key => $notification){
+            $conversation = Chatroom::where('user_id', $notification->fromuser->id)->whereIn('room', $rooms->toArray())->first();
+            if($notification->type === 'chat'){
+                $notifications[$key]['room'] = $conversation != null ? $conversation['room'] : null;
+            }else{
+                $notifications[$key]['room'] = null;
+            }
+        }
+        return response()->json($notifications);
+    }
+
+    public function createNotification(Request $request){
+        DB::beginTransaction();
+        try{
+            $create = Notification::create([
+                'user_id' => $request->input('to_user_id'),
+                'from_user_id' => $request->input('from_user_id'),
+                'title' => $request->input('title'),
+                'body' => $request->input('body'),
+                'type' => $request->input('type'),
+                'thread_id' => $request->input('thread_id')
+            ]);
+            DB::commit();
+            return response()->json($create);
         }catch(Exception $e){
             DB::rollback();
             return response()->json(['error' => $e], 400);
