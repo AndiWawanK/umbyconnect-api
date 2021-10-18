@@ -22,7 +22,9 @@ class ProfileController extends Controller
             : $request->user()->username;
 
         $userId = User::where('username', $param)->first();
-
+        
+        $rooms = Chatroom::where('user_id', $request->user()->id)->pluck('room');
+        
         $isFollow = Followers::where([
             ['follower_id', '=', $request->user()->id],
             ['followed_id', '=', $userId->id] 
@@ -32,6 +34,9 @@ class ProfileController extends Controller
                     ->where('username', $param)
                     ->first();
         $user->isFollow = $isFollow;
+
+        $conversation = Chatroom::where('user_id', $user->id)->whereIn('room', $rooms->toArray())->first();
+        $user['room'] = $conversation != null ? $conversation['room'] : null;
         return response()->json($user);
     }
 
