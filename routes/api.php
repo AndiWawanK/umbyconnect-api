@@ -56,6 +56,7 @@ Route::group([
     Route::get('/profile/{userId}/follow', 'ProfileController@follow');
     Route::post('/set-avatar', 'ProfileController@setAvatar');
     Route::post('/profile/update', 'ProfileController@updateProfile');
+    Route::post('/profile/update/fcmtoken', 'ProfileController@updateFcmToken');
 });
 
 // chatroom route

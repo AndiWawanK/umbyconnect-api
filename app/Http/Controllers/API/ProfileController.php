@@ -90,15 +90,15 @@ class ProfileController extends Controller
         try{
             if($isFollow){
                 $unfollow = Followers::where([
-                    ['follower_id', '=', $userId],
-                    ['followed_id', '=', $currentUserId->id] 
+                    ['follower_id', '=', $currentUserId->id],
+                    ['followed_id', '=', $userId] 
                 ])->delete();
                 DB::commit();
                 return response()->json(['isFollow' => false], 200);
             }else{
                 $follow = Followers::create([
-                    'follower_id' => $userId,
-                    'followed_id' => $currentUserId->id
+                    'follower_id' => $currentUserId->id,
+                    'followed_id' => $userId
                 ]);
                 DB::commit();
                 return response()->json(['isFollow' => true], 200);
@@ -197,5 +197,24 @@ class ProfileController extends Controller
         $file->move(public_path($directory), $fileName);
         $link = url($directory) . '/' . $fileName;
         return $link;
+    }
+
+    public function updateFcmToken(Request $request){
+        $currentUser = $request->user();
+
+        DB::beginTransaction();
+        try{
+            $update = User::where('id', $currentUser->id)->update([
+                'fcm_token' => $request->input('fcm_token')
+            ]);
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'fcm_token' => $request->input('fcm_token')
+            ]);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e], 400);
+        }
     }
 }
