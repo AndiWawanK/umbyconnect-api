@@ -59,6 +59,8 @@ Route::group([
     Route::post('/profile/update/fcmtoken', 'ProfileController@updateFcmToken');
     Route::get('/profile/notification', 'ProfileController@getUserNotification');
     Route::post('/profile/notification/create', 'ProfileController@createNotification');
+    Route::get('/profile/notification/badge', 'ProfileController@getUserNotificationBadge');
+    Route::get('/profile/notification/read/{notificationId}', 'ProfileController@readUserNotification');
 });
 
 // chatroom route

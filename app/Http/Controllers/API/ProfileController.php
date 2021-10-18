@@ -258,4 +258,34 @@ class ProfileController extends Controller
             return response()->json(['error' => $e], 400);
         }
     }
+
+    public function getUserNotificationBadge(Request $request){
+        $currentUser = $request->user();
+
+        $bagde = Notification::where([
+            ['user_id', '=', $currentUser->id],
+            ['is_read', '=', false]
+        ])->count();
+
+        return response()->json(['badge' => $bagde]);
+    }
+
+    public function readUserNotification(Request $request){
+        $currentUser = $request->user();
+        $notificationId = $request->notificationId;
+
+        DB::beginTransaction();
+        try{
+            $bagde = Notification::where('id', $notificationId)->update([
+                'is_read' => true
+            ]);
+            DB::commit();
+            return response()->json([
+                'action' => 'read notification successfully'
+            ]);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json(['error' => $e]);
+        }
+    }
 }
