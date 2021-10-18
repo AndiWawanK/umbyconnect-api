@@ -228,7 +228,7 @@ class ProfileController extends Controller
         $currentUser = $request->user();
         $rooms = Chatroom::where('user_id', $currentUser->id)->pluck('room');
 
-        $notifications = Notification::with(['fromuser', 'thread'])->where('user_id', $currentUser->id)->get();
+        $notifications = Notification::with(['fromuser', 'thread', 'thread.user'])->where('user_id', $currentUser->id)->get();
         foreach($notifications as $key => $notification){
             $conversation = Chatroom::where('user_id', $notification->fromuser->id)->whereIn('room', $rooms->toArray())->first();
             if($notification->type === 'chat'){
